@@ -183,6 +183,7 @@ extern const struct _mp_obj_module_t gamepad_module;
 extern const struct _mp_obj_module_t neopixel_write_module;
 extern const struct _mp_obj_module_t usb_hid_module;
 extern const struct _mp_obj_module_t bleio_module;
+extern const struct _mp_obj_module_t mp_module_mesh;
 
 extern const struct _mp_obj_module_t mp_module_ubluepy;
 
@@ -223,6 +224,8 @@ extern const struct _mp_obj_module_t mp_module_ubluepy;
     USBHID_MODULE  \
     BLEIO_MODULE   \
     UBLUEPY_MODULE \
+    { MP_OBJ_NEW_QSTR(MP_QSTR_mesh), (mp_obj_t)&mp_module_mesh }, \
+
 
 // extra built in names to add to the global namespace
 #define MICROPY_PORT_BUILTINS \
