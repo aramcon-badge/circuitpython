@@ -122,7 +122,8 @@ SRC_C += \
 	peripherals/nrf/clocks.c \
 	peripherals/nrf/$(MCU_CHIP)/pins.c \
 	peripherals/nrf/$(MCU_CHIP)/power.c \
-	supervisor/shared/memory.c
+	supervisor/shared/memory.c \
+	mesh.c
 
 DRIVERS_SRC_C += $(addprefix modules/,\
 	ubluepy/modubluepy.c \
