@@ -53,6 +53,10 @@ INC += -I./drivers
 INC += -I./peripherals
 INC += -I../../lib/tinyusb/src
 INC += -I./usb
+INC += -I./sdk/dependencies
+INC += -I./sdk/libraries/app_error
+INC += -I./openthread/include
+INC += -I./openthread/project
 
 NRF_DEFINES += -DCONFIG_GPIO_AS_PINRESET
 
@@ -63,10 +67,12 @@ CFLAGS += -fno-strict-aliasing
 CFLAGS += -fstack-usage -fno-builtin -fshort-enums
 CFLAGS += -fdata-sections -ffunction-sections
 CFLAGS += -D__START=main
+CFLAGS += -DNRFX_CLOCK_ENABLED=1 -DNRFX_CLOCK_CONFIG_LF_SRC=1 -DNRFX_CLOCK_CONFIG_IRQ_PRIORITY=7
 
 LDFLAGS = $(CFLAGS)
 LDFLAGS += -Xlinker -Map=$(@:.elf=.map)
 LDFLAGS += -mthumb -mabi=aapcs -T $(LD_FILE) -L boards/
+LDFLAGS += -specs=nano.specs -specs=nosys.specs
 LDFLAGS += -Wl,--gc-sections
 
 #Debugging/Optimization
@@ -86,8 +92,17 @@ LIBGCC_FILE_NAME = $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 LIBS := -L $(dir $(LIBM_FILE_NAME)) -lm
 LIBS += -L $(dir $(LIBC_FILE_NAME)) -lc
 LIBS += -L $(dir $(LIBGCC_FILE_NAME)) -lgcc
+LIBS += -lnosys
+LIBS += openthread/lib/gcc/libopenthread-ftd.a
+LIBS += openthread/lib/gcc/libmbedcrypto.a
+LIBS += openthread/lib/gcc/libopenthread-nrf52840-sdk.a
+LIBS += openthread/lib/gcc/libopenthread-nrf52840-softdevice-sdk.a
+LIBS += openthread/lib/gcc/libopenthread-platform-utils.a
+LIBS += openthread/lib/gcc/libopenthread-cli-ftd.a
+LIBS += sdk/libraries/nrf_cc310/lib/libnrf_cc310_0.9.10.a
 
 SRC_NRFX = $(addprefix nrfx/,\
+	drivers/src/nrfx_clock.c \
 	drivers/src/nrfx_power.c \
 	drivers/src/nrfx_spim.c \
 	drivers/src/nrfx_twim.c \
@@ -123,6 +138,9 @@ SRC_C += \
 	peripherals/nrf/$(MCU_CHIP)/pins.c \
 	peripherals/nrf/$(MCU_CHIP)/power.c \
 	supervisor/shared/memory.c \
+	drivers/clock/nrf_drv_clock.c \
+	sdk/libraries/app_error/app_error.c \
+	sdk/dependencies/app_util_platform.c \
 	mesh.c
 
 DRIVERS_SRC_C += $(addprefix modules/,\

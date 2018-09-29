@@ -24,20 +24,29 @@
  * THE SOFTWARE.
  */
 #include <stdio.h>
+#include <openthread/cli.h>
+#include <openthread/instance.h>
+#include <openthread/platform/openthread-system.h>
 
 #include "py/mphal.h"
 #include "py/obj.h"
 #include "py/runtime.h"
 
-STATIC mp_obj_t mesh_hello(void) {
-    printf("Hello world!\n");
-    return mp_const_none;
+static otInstance *mp_ot_instance;
+
+STATIC mp_obj_t mesh_init(void) {
+    otSysInit(0, NULL);
+    mp_ot_instance = otInstanceInitSingle();
+    // TODO check for NULL
+
+    otCliUartInit(mp_ot_instance);
+    return MP_OBJ_NEW_SMALL_INT(0);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(mesh_hello_obj, mesh_hello);
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(mesh_init_obj, mesh_init);
 
 STATIC const mp_map_elem_t mesh_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_mesh) },
-    { MP_OBJ_NEW_QSTR(MP_QSTR_hello), (mp_obj_t)&mesh_hello_obj },
+    { MP_OBJ_NEW_QSTR(MP_QSTR_init), (mp_obj_t)&mesh_init_obj },
 };
 
 STATIC MP_DEFINE_CONST_DICT (
@@ -49,3 +58,10 @@ const mp_obj_module_t mp_module_mesh = {
     .base = { &mp_type_module },
     .globals = (mp_obj_dict_t*)&mp_module_mesh_globals,
 };
+
+// Junk - just to make it compile...
+
+void SEGGER_RTT_ConfigUpBuffer() {}
+void SEGGER_RTT_WriteNoLock() {}
+int __start_ot_flash_data = 0;
+int __stop_ot_flash_data = 0;
