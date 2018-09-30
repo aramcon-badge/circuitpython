@@ -207,7 +207,7 @@ static inline bool _NRFX_IRQ_IS_PENDING(IRQn_Type irq_number)
 #define NRFX_DELAY_US(us_time) nrfx_coredep_delay_us(us_time)
 
 //------------------------------------------------------------------------------
-
+#include <sdk_errors.h>
 /**
  * @brief When set to a non-zero value, this macro specifies that the
  *        @ref nrfx_error_codes and the @ref ret_code_t type itself are defined

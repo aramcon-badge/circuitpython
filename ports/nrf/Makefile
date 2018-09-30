@@ -53,6 +53,23 @@ INC += -I./drivers
 INC += -I./peripherals
 INC += -I../../lib/tinyusb/src
 INC += -I./usb
+#INC += -I./sdk/dependencies
+#INC += -I./sdk/libraries/app_error
+INC += -I$(NRF_SDK)/external/openthread/include
+INC += -I$(NRF_SDK)/external/openthread/project
+INC += -I$(NRF_SDK)/components/drivers_nrf/usbd
+INC += -I$(NRF_SDK)/components/libraries/usbd
+INC += -I$(NRF_SDK)/components/libraries/usbd/class/cdc
+INC += -I$(NRF_SDK)/components/libraries/usbd/class/cdc/acm
+INC += -I$(NRF_SDK)/components/libraries/util
+#INC += -I$(NRF_SDK)/examples/thread/cli/usb_bootloader/pca10056/blank/config
+INC += -I$(NRF_SDK)/integration/nrfx/legacy
+INC += -I$(NRF_SDK)/components/libraries/atomic_fifo
+INC += -I$(NRF_SDK)/components/libraries/log
+INC += -I$(NRF_SDK)/components/libraries/experimental_section_vars
+INC += -I$(NRF_SDK)/components/libraries/atomic
+INC += -I$(NRF_SDK)/components/libraries/strerror
+INC += -I$(NRF_SDK)/components/libraries/log/src
 
 NRF_DEFINES += -DCONFIG_GPIO_AS_PINRESET
 
@@ -63,10 +80,12 @@ CFLAGS += -fno-strict-aliasing
 CFLAGS += -fstack-usage -fno-builtin -fshort-enums
 CFLAGS += -fdata-sections -ffunction-sections
 CFLAGS += -D__START=main
+CFLAGS += -DUSBD_POWER_DETECTION=1
 
 LDFLAGS = $(CFLAGS)
 LDFLAGS += -Xlinker -Map=$(@:.elf=.map)
 LDFLAGS += -mthumb -mabi=aapcs -T $(LD_FILE) -L boards/
+LDFLAGS += -specs=nano.specs -specs=nosys.specs
 LDFLAGS += -Wl,--gc-sections
 
 #Debugging/Optimization
@@ -86,6 +105,14 @@ LIBGCC_FILE_NAME = $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 LIBS := -L $(dir $(LIBM_FILE_NAME)) -lm
 LIBS += -L $(dir $(LIBC_FILE_NAME)) -lc
 LIBS += -L $(dir $(LIBGCC_FILE_NAME)) -lgcc
+LIBS += -lnosys
+LIBS += $(NRF_SDK)/external/openthread/lib/gcc/libopenthread-ftd.a
+LIBS += $(NRF_SDK)/external/openthread/lib/gcc/libmbedcrypto.a
+#LIBS += $(NRF_SDK)/external/openthread/lib/gcc/libopenthread-nrf52840-sdk-usb.a
+LIBS += $(NRF_SDK)/external/openthread/lib/gcc/libopenthread-nrf52840-softdevice-sdk-usb.a
+LIBS += $(NRF_SDK)/external/openthread/lib/gcc/libopenthread-platform-utils.a
+LIBS += $(NRF_SDK)/external/openthread/lib/gcc/libopenthread-cli-ftd.a
+LIBS += $(NRF_SDK)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a
 
 SRC_NRFX = $(addprefix nrfx/,\
 	drivers/src/nrfx_power.c \
@@ -123,7 +150,16 @@ SRC_C += \
 	peripherals/nrf/$(MCU_CHIP)/pins.c \
 	peripherals/nrf/$(MCU_CHIP)/power.c \
 	supervisor/shared/memory.c \
-	mesh.c
+	mesh.c \
+	$(NRF_SDK)/components/libraries/usbd/app_usbd.c \
+	$(NRF_SDK)/components/libraries/usbd/class/cdc/acm/app_usbd_cdc_acm.c \
+	$(NRF_SDK)/components/libraries/usbd/app_usbd_core.c \
+	$(NRF_SDK)/components/libraries/usbd/app_usbd_serial_num.c \
+	$(NRF_SDK)/components/libraries/usbd/app_usbd_string_desc.c \
+	$(NRF_SDK)/components/drivers_nrf/usbd/nrf_drv_usbd.c \
+	$(NRF_SDK)/modules/nrfx/drivers/src/nrfx_clock.c \
+	$(NRF_SDK)/integration/nrfx/legacy/nrf_drv_clock.c \
+	$(NRF_SDK)/components/libraries/util/app_util_platform.c
 
 DRIVERS_SRC_C += $(addprefix modules/,\
 	ubluepy/modubluepy.c \
