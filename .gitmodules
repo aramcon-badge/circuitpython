@@ -83,3 +83,6 @@
 [submodule "tools/huffman"]
 	path = tools/huffman
 	url = https://github.com/tannewt/huffman.git
+[submodule "lib/openthread"]
+	path = lib/openthread
+	url = https://github.com/openthread/openthread/
