@@ -66,6 +66,9 @@
 #define BLE_SLAVE_LATENCY            0
 #define BLE_CONN_SUP_TIMEOUT         MSEC_TO_UNITS(4000, UNIT_10_MS)
 
+#define BLE_GAP_CONN_TAG             1
+#define BLE_GAP_MAX_MTU              247
+
 #ifndef BLE_GAP_ADV_MAX_SIZE
 #define BLE_GAP_ADV_MAX_SIZE            31
 #endif
@@ -169,6 +172,14 @@ uint32_t ble_drv_stack_enable(void) {
     ble_enable_params.gatts_enable_params.service_changed  = 0;
     ble_enable_params.gap_enable_params.periph_conn_count  = 1;
     ble_enable_params.gap_enable_params.central_conn_count = 1;
+#else
+    // Configure max MTU
+    ble_cfg_t ble_config;
+    memset(&ble_config, 0, sizeof(ble_config));
+    ble_config.conn_cfg.conn_cfg_tag = BLE_GAP_CONN_TAG;                     
+    ble_config.conn_cfg.params.gatt_conn_cfg.att_mtu = BLE_GAP_MAX_MTU;   
+    err_code = sd_ble_cfg_set(BLE_CONN_CFG_GATT, &ble_config, 0x20004000);
+    BLE_DRIVER_LOG("BLE GATT cfg set status: " UINT_FMT "\n", (uint16_t)err_code);
 #endif
 
 #if (BLE_API_VERSION == 2)
@@ -360,7 +371,7 @@ bool ble_drv_characteristic_add(ubluepy_characteristic_obj_t * p_char_obj) {
 #if (BLE_API_VERSION == 2)
     attr_char_value.max_len   = (GATT_MTU_SIZE_DEFAULT - 3);
 #else
-    attr_char_value.max_len   = (BLE_GATT_ATT_MTU_DEFAULT - 3);
+    attr_char_value.max_len   = (BLE_GAP_MAX_MTU - 3);
 #endif
 
     ble_gatts_char_handles_t handles;
@@ -603,9 +614,9 @@ bool ble_drv_advertise_data(ubluepy_advertise_data_t * p_adv_params) {
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_OSError,
                   translate("Can not apply advertisement data. status: 0x%02x"), (uint16_t)err_code));
     }
-    err_code = sd_ble_gap_adv_start(m_adv_handle, BLE_CONN_CFG_TAG_DEFAULT);
+    err_code = sd_ble_gap_adv_start(m_adv_handle, BLE_GAP_CONN_TAG);
 #elif (BLUETOOTH_SD == 132 && BLE_API_VERSION == 4)
-    err_code = sd_ble_gap_adv_start(&m_adv_params, BLE_CONN_CFG_TAG_DEFAULT);
+    err_code = sd_ble_gap_adv_start(&m_adv_params, BLE_GAP_CONN_TAG);
 #else
     err_code = sd_ble_gap_adv_start(&m_adv_params);
 #endif
@@ -823,7 +834,7 @@ void ble_drv_connect(uint8_t * p_addr, uint8_t addr_type) {
 #if (BLE_API_VERSION == 2)
     if ((err_code = sd_ble_gap_connect(&addr, &scan_params, &conn_params)) != 0) {
 #else
-    if ((err_code = sd_ble_gap_connect(&addr, &scan_params, &conn_params, BLE_CONN_CFG_TAG_DEFAULT)) != 0) {
+    if ((err_code = sd_ble_gap_connect(&addr, &scan_params, &conn_params, BLE_GAP_CONN_TAG)) != 0) {
 #endif
         nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_OSError,
                   translate("Can not connect. status: 0x%02x"), (uint16_t)err_code));
@@ -947,7 +958,8 @@ static void ble_evt_handler(ble_evt_t * p_ble_evt) {
 #if (BLE_API_VERSION == 4)
         case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
             BLE_DRIVER_LOG("GATTS EVT EXCHANGE MTU REQUEST\n");
-            (void)sd_ble_gatts_exchange_mtu_reply(p_ble_evt->evt.gatts_evt.conn_handle, 23); // MAX MTU size
+            uint16_t client_mtu = p_ble_evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu;
+            (void)sd_ble_gatts_exchange_mtu_reply(p_ble_evt->evt.gatts_evt.conn_handle, client_mtu);
             break;
 #endif
 
@@ -1096,7 +1108,7 @@ static void ble_evt_handler(ble_evt_t * p_ble_evt) {
 #if (BLE_API_VERSION == 2)
 static uint8_t m_ble_evt_buf[sizeof(ble_evt_t) + (GATT_MTU_SIZE_DEFAULT)] __attribute__ ((aligned (4)));
 #else
-static uint8_t m_ble_evt_buf[sizeof(ble_evt_t) + (BLE_GATT_ATT_MTU_DEFAULT)] __attribute__ ((aligned (4)));
+static uint8_t m_ble_evt_buf[sizeof(ble_evt_t) + (BLE_GAP_MAX_MTU)] __attribute__ ((aligned (4)));
 #endif
 
 void SWI2_EGU2_IRQHandler(void) {
