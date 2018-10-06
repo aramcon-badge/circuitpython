@@ -28,9 +28,13 @@
 #include "py/mphal.h"
 #include "py/obj.h"
 #include "py/runtime.h"
+#include "openthread/instance.h"
+#include "openthread/link.h"
 
 STATIC mp_obj_t mesh_hello(void) {
     printf("Hello world!\n");
+    otInstance * instance = otInstanceInitSingle();
+    otLinkSetChannel(instance, 11);
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(mesh_hello_obj, mesh_hello);

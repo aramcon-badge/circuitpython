@@ -53,6 +53,7 @@ INC += -I./drivers
 INC += -I./peripherals
 INC += -I../../lib/tinyusb/src
 INC += -I./usb
+INC += -I./openthread/include
 
 NRF_DEFINES += -DCONFIG_GPIO_AS_PINRESET
 
@@ -67,6 +68,7 @@ CFLAGS += -D__START=main
 LDFLAGS = $(CFLAGS)
 LDFLAGS += -Xlinker -Map=$(@:.elf=.map)
 LDFLAGS += -mthumb -mabi=aapcs -T $(LD_FILE) -L boards/
+LDFLAGS += -specs=nano.specs -specs=nosys.specs
 LDFLAGS += -Wl,--gc-sections
 
 #Debugging/Optimization
@@ -86,6 +88,15 @@ LIBGCC_FILE_NAME = $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 LIBS := -L $(dir $(LIBM_FILE_NAME)) -lm
 LIBS += -L $(dir $(LIBC_FILE_NAME)) -lc
 LIBS += -L $(dir $(LIBGCC_FILE_NAME)) -lgcc
+LIBS += -lnosys
+LIBS += openthread/lib/libopenthread-ftd.a
+LIBS += openthread/lib/libmbedcrypto.a
+LIBS += openthread/lib/libopenthread-nrf52840.a
+#LIBS += openthread/lib/libopenthread-nrf52840-sdk.a
+#LIBS += openthread/lib/libopenthread-nrf52840-softdevice-sdk.a
+LIBS += openthread/lib/libopenthread-platform-utils.a
+LIBS += openthread/lib/libopenthread-cli-ftd.a
+LIBS += openthread/lib/libnrf_cc310_0.9.10.a
 
 SRC_NRFX = $(addprefix nrfx/,\
 	drivers/src/nrfx_power.c \
