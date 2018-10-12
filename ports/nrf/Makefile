@@ -53,6 +53,35 @@ INC += -I./drivers
 INC += -I./peripherals
 INC += -I../../lib/tinyusb/src
 INC += -I./usb
+INC += -I $(NRF_SDK)/components
+INC += -I $(NRF_SDK)/modules/nrfx/mdk
+INC += -I $(NRF_SDK)/external/nrf_cc310/include
+INC += -I $(NRF_SDK)/components/libraries/scheduler
+INC += -I $(NRF_SDK)/components/libraries/timer
+INC += -I $(NRF_SDK)/components/libraries/strerror
+INC += -I $(NRF_SDK)/components/toolchain/cmsis/include
+INC += -I $(NRF_SDK)/components/libraries/util
+INC += -I $(NRF_SDK)/external/openthread/include
+INC += -I $(NRF_SDK)/components/libraries/balloc
+INC += -I $(NRF_SDK)/components/libraries/ringbuf
+INC += -I $(NRF_SDK)/modules/nrfx/hal
+INC += -I $(NRF_SDK)/components/libraries/bsp
+INC += -I $(NRF_SDK)/components/libraries/log
+INC += -I $(NRF_SDK)/components/libraries/button
+INC += -I $(NRF_SDK)/modules/nrfx
+INC += -I $(NRF_SDK)/components/libraries/experimental_section_vars
+INC += -I $(NRF_SDK)/integration/nrfx/legacy
+INC += -I $(NRF_SDK)/components/libraries/delay
+INC += -I $(NRF_SDK)/external/segger_rtt
+INC += -I $(NRF_SDK)/components/drivers_nrf/nrf_soc_nosd
+INC += -I $(NRF_SDK)/components/libraries/atomic
+INC += -I $(NRF_SDK)/components/boards
+INC += -I $(NRF_SDK)/components/libraries/memobj
+INC += -I $(NRF_SDK)/integration/nrfx
+INC += -I $(NRF_SDK)/modules/nrfx/drivers/include
+INC += -I $(NRF_SDK)/components/thread/utils
+INC += -I $(NRF_SDK)/external/fprintf
+INC += -I $(NRF_SDK)/components/libraries/log/src
 
 NRF_DEFINES += -DCONFIG_GPIO_AS_PINRESET
 
@@ -86,6 +115,55 @@ LIBGCC_FILE_NAME = $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
 LIBS := -L $(dir $(LIBM_FILE_NAME)) -lm
 LIBS += -L $(dir $(LIBC_FILE_NAME)) -lc
 LIBS += -L $(dir $(LIBGCC_FILE_NAME)) -lgcc
+LIBS += $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-cli-ftd.a
+LIBS += $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-diag.a
+LIBS += $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-ftd.a
+LIBS += $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-platform-utils.a
+LIBS += $(SDK_ROOT)/external/openthread/lib/gcc/libmbedcrypto.a
+LIBS += $(SDK_ROOT)/external/openthread/lib/gcc/libopenthread-nrf52840-sdk.a
+LIBS += $(SDK_ROOT)/external/nrf_cc310/lib/libnrf_cc310_0.9.10.a
+
+
+
+#$(NRF_SDK)/components/boards/boards.c
+
+SRC_OPENTHREAD = \
+	$(NRF_SDK)/modules/nrfx/mdk/gcc_startup_nrf52840.S \
+	$(NRF_SDK)/components/libraries/log/src/nrf_log_backend_rtt.c \
+	$(NRF_SDK)/components/libraries/log/src/nrf_log_backend_serial.c \
+	$(NRF_SDK)/components/libraries/log/src/nrf_log_default_backends.c \
+	$(NRF_SDK)/components/libraries/log/src/nrf_log_frontend.c \
+	$(NRF_SDK)/components/libraries/log/src/nrf_log_str_formatter.c \
+	$(NRF_SDK)/components/libraries/button/app_button.c \
+	$(NRF_SDK)/components/libraries/util/app_error.c \
+	$(NRF_SDK)/components/libraries/util/app_error_handler_gcc.c \
+	$(NRF_SDK)/components/libraries/util/app_error_weak.c \
+	$(NRF_SDK)/components/libraries/scheduler/app_scheduler.c \
+	$(NRF_SDK)/components/libraries/timer/app_timer.c \
+	$(NRF_SDK)/components/libraries/util/app_util_platform.c \
+	$(NRF_SDK)/components/libraries/assert/assert.c \
+	$(NRF_SDK)/components/libraries/util/nrf_assert.c \
+	$(NRF_SDK)/components/libraries/atomic/nrf_atomic.c \
+	$(NRF_SDK)/components/libraries/balloc/nrf_balloc.c \
+	$(NRF_SDK)/external/fprintf/nrf_fprintf.c \
+	$(NRF_SDK)/external/fprintf/nrf_fprintf_format.c \
+	$(NRF_SDK)/components/libraries/memobj/nrf_memobj.c \
+	$(NRF_SDK)/components/libraries/ringbuf/nrf_ringbuf.c \
+	$(NRF_SDK)/components/libraries/strerror/nrf_strerror.c \
+	$(NRF_SDK)/integration/nrfx/legacy/nrf_drv_clock.c \
+	$(NRF_SDK)/components/drivers_nrf/nrf_soc_nosd/nrf_nvic.c \
+	$(NRF_SDK)/modules/nrfx/hal/nrf_nvmc.c \
+	$(NRF_SDK)/components/drivers_nrf/nrf_soc_nosd/nrf_soc.c \
+	$(NRF_SDK)/modules/nrfx/drivers/src/nrfx_clock.c \
+	$(NRF_SDK)/modules/nrfx/drivers/src/nrfx_gpiote.c \
+	$(NRF_SDK)/modules/nrfx/drivers/src/nrfx_power_clock.c \
+	$(NRF_SDK)/components/libraries/bsp/bsp.c \
+	$(NRF_SDK)/components/libraries/bsp/bsp_thread.c \
+	$(NRF_SDK)/external/segger_rtt/SEGGER_RTT.c \
+	$(NRF_SDK)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
+	$(NRF_SDK)/external/segger_rtt/SEGGER_RTT_printf.c \
+	$(NRF_SDK)/modules/nrfx/mdk/system_nrf52840.c \
+	$(NRF_SDK)/components/thread/utils/thread_utils.c \
 
 SRC_NRFX = $(addprefix nrfx/,\
 	drivers/src/nrfx_power.c \
@@ -249,6 +327,7 @@ OBJ += $(addprefix $(BUILD)/, $(DRIVERS_SRC_C:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(SRC_COMMON_HAL_EXPANDED:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(SRC_SHARED_MODULE_EXPANDED:.c=.o))
 OBJ += $(addprefix $(BUILD)/, $(SRC_S:.s=.o))
+OBJ += $(addprefix $(BUILD)/, $(SRC_OPENTHREAD:.c=.o))
 
 $(BUILD)/$(FATFS_DIR)/ff.o: COPT += -Os
 $(filter $(PY_BUILD)/../extmod/vfs_fat_%.o, $(PY_O)): COPT += -Os
