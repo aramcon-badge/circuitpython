@@ -55,6 +55,7 @@ INC += -I./nrfx/mdk
 INC += -I./nrfx/drivers/include
 INC += -I./bluetooth
 INC += -I./peripherals
+INC += -I./esb_drv
 INC += -I../../lib/mp-readline
 INC += -I../../lib/tinyusb/src
 INC += -I../../supervisor/shared/usb
@@ -139,7 +140,9 @@ SRC_C += \
 	peripherals/nrf/$(MCU_CHIP)/pins.c \
 	peripherals/nrf/$(MCU_CHIP)/power.c \
 	peripherals/nrf/timers.c \
-	supervisor/shared/memory.c
+	supervisor/shared/memory.c \
+	esb_drv/nrf_esb.c \
+	esb.c
 
 
 SRC_COMMON_HAL += \
