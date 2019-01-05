@@ -173,6 +173,7 @@ jobs:
         - "TG-Watch02A"
         - "aloriumtech_evo_m51"
         - "aramcon_badge_2019"
+        - "aramcon_badge_2020"
         - "arduino_mkr1300"
         - "arduino_mkrzero"
         - "arduino_nano_33_ble"
