@@ -1,9 +1,9 @@
-
 /*
- * This file is part of the Micro Python project, http://micropython.org/
+ * This file is part of the MicroPython project, http://micropython.org/
  *
  * The MIT License (MIT)
  *
+ * Copyright (c) 2016 Glenn Ruben Bakke
  * Copyright (c) 2018 Dan Halbert for Adafruit Industries
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,14 +25,29 @@
  * THE SOFTWARE.
  */
 
-#include "nrfx.h"
+#define MICROPY_HW_BOARD_NAME       "AramCon Badge"
+#define MICROPY_HW_MCU_NAME         "nRF52840"
+#define MICROPY_PY_SYS_PLATFORM     "AramCon Badge"
 
-void nrf_peripherals_clocks_init(void) {
-    // Set low-frequency clock source to be crystal. If there's a crystalless board, this will need to be
-    // generalized.
-    NRF_CLOCK->LFCLKSRC = (uint32_t)((CLOCK_LFCLKSRC_SRC_RC << CLOCK_LFCLKSRC_SRC_Pos) & CLOCK_LFCLKSRC_SRC_Msk);
-    NRF_CLOCK->TASKS_LFCLKSTART = 1UL;
+#define MICROPY_HW_LED_STATUS          (&pin_P1_11)
 
-    // Wait for clocks to start.
-    while (NRF_CLOCK->EVENTS_LFCLKSTARTED == 0) {}
-}
+#define CIRCUITPY_AUTORELOAD_DELAY_MS 500
+
+// If you change this, then make sure to update the linker scripts as well to
+// make sure you don't overwrite code
+#define PORT_HEAP_SIZE              (128 * 1024)
+// TODO #define CIRCUITPY_INTERNAL_NVM_SIZE 8192
+
+#define BOARD_FLASH_SIZE (FLASH_SIZE - 0x4000 - CIRCUITPY_INTERNAL_NVM_SIZE)
+
+#define BOARD_HAS_CRYSTAL 0
+
+#define DEFAULT_I2C_BUS_SCL         (&pin_P0_15)
+#define DEFAULT_I2C_BUS_SDA         (&pin_P0_17)
+
+#define DEFAULT_SPI_BUS_SCK         (&pin_P1_01)
+#define DEFAULT_SPI_BUS_MOSI        (&pin_P1_10)
+#define DEFAULT_SPI_BUS_MISO        (&pin_P1_09)
+
+#define DEFAULT_UART_BUS_RX         (&pin_P0_20)
+#define DEFAULT_UART_BUS_TX         (&pin_P0_13)

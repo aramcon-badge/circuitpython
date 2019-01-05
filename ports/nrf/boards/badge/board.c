@@ -1,10 +1,9 @@
-
 /*
- * This file is part of the Micro Python project, http://micropython.org/
+ * This file is part of the MicroPython project, http://micropython.org/
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2018 Dan Halbert for Adafruit Industries
+ * Copyright (c) 2018 Scott Shawcroft for Adafruit Industries
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +24,15 @@
  * THE SOFTWARE.
  */
 
-#include "nrfx.h"
+#include "boards/board.h"
 
-void nrf_peripherals_clocks_init(void) {
-    // Set low-frequency clock source to be crystal. If there's a crystalless board, this will need to be
-    // generalized.
-    NRF_CLOCK->LFCLKSRC = (uint32_t)((CLOCK_LFCLKSRC_SRC_RC << CLOCK_LFCLKSRC_SRC_Pos) & CLOCK_LFCLKSRC_SRC_Msk);
-    NRF_CLOCK->TASKS_LFCLKSTART = 1UL;
+void board_init(void) {
+}
 
-    // Wait for clocks to start.
-    while (NRF_CLOCK->EVENTS_LFCLKSTARTED == 0) {}
+bool board_requests_safe_mode(void) {
+  return false;
+}
+
+void reset_board(void) {
+
 }
