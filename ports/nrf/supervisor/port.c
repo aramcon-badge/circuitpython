@@ -95,6 +95,10 @@ safe_mode_t port_init(void) {
     // Will do usb_init() if chip supports USB.
     board_init();
 
+    if (board_requests_safe_mode()) {
+        return USER_SAFE_MODE;
+    }
+
     return NO_SAFE_MODE;
 }
 

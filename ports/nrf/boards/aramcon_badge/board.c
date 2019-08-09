@@ -25,12 +25,19 @@
  */
 
 #include "boards/board.h"
+#include "common-hal/microcontroller/Pin.h"
 
 void board_init(void) {
 }
 
+#define BUTTON_LEFT NRF_GPIO_PIN_MAP(0, 2)
+
+// Boot into safe mode if the left button is pressed
 bool board_requests_safe_mode(void) {
-  return false;
+    nrf_gpio_cfg_input(BUTTON_LEFT, NRF_GPIO_PIN_PULLUP);
+    bool safe_mode = !nrf_gpio_pin_read(BUTTON_LEFT);
+    nrf_gpio_cfg_default(BUTTON_LEFT);
+    return safe_mode;
 }
 
 void reset_board(void) {

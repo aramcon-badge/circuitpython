@@ -49,6 +49,8 @@
 #define SPI_FLASH_CS_PIN &pin_P1_02
 #endif
 
+// Explanation of how a user got into safe mode.
+#define BOARD_USER_SAFE_MODE_ACTION "pressing the left button at start up"
 
 // If you change this, then make sure to update the linker scripts as well to
 // make sure you don't overwrite code
