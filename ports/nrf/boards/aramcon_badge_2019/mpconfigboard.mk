@@ -1,6 +1,6 @@
 USB_VID = 0x239A
 USB_PID = 0x802A
-USB_PRODUCT = "AramCon Badge"
+USB_PRODUCT = "AramCon Badge 2019"
 USB_MANUFACTURER = "CodeMagic"
 
 MCU_CHIP = nrf52840
