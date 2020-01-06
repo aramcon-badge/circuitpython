@@ -10,3 +10,8 @@ EXTERNAL_FLASH_DEVICE_COUNT = 1
 EXTERNAL_FLASH_DEVICES = "W25Q128JV_SQ"
 
 CIRCUITPY_DISPLAYIO = 1
+FROZEN_MPY_DIRS += $(TOP)/frozen/Aramcon_Badge
+FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_BusDevice
+FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_NeoPixel
+FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_Display_Text
+#FROZEN_MPY_DIRS += $(TOP)/frozen/Adafruit_CircuitPython_IL0373
