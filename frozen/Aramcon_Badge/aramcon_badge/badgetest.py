@@ -3,6 +3,7 @@ import displayio
 from adafruit_display_text.label import Label
 import terminalio
 import time
+from aramcon_badge.banner import banner, banner_palette
 
 display = badge.display
 
@@ -15,8 +16,7 @@ def run():
     background_sprite = displayio.TileGrid(background,pixel_shader=background_palette)
     frame.append(background_sprite)
 
-    image = displayio.OnDiskBitmap(open("assets/banner.bmp", "rb"))
-    grid = displayio.TileGrid(image, pixel_shader=displayio.ColorConverter())
+    grid = displayio.TileGrid(banner, pixel_shader=banner_palette)
     frame.append(grid)
 
     factory_label = Label(terminalio.FONT, text='Factory Test Program')
