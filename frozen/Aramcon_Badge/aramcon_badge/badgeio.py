@@ -10,6 +10,12 @@ import displayio
 import neopixel
 
 class Badge:
+    BTN_UP = 1 << 0
+    BTN_DOWN = 1 << 1
+    BTN_RIGHT = 1 << 2
+    BTN_LEFT = 1 << 3
+    BTN_ACTION = 1 << 4
+
     def __init__(self):
         self._up = DigitalInOut(board.UP_BUTTON)
         self._up.switch_to_input(pull=Pull.UP)
@@ -34,6 +40,7 @@ class Badge:
         self._display = None
         self._sound = None
         self._midi = None
+        self._gamepad = None
 
     @property
     def up(self):
@@ -59,6 +66,15 @@ class Badge:
     def action(self):
         """``True`` when the action button is pressed. ``False`` if not."""
         return not self._action.value
+
+    @property
+    def gamepad(self):
+        if not self._gamepad:
+            import gamepad
+            self._gamepad = gamepad.GamePad(
+                self._up, self._left, self._down, self._right, self._action
+            )
+        return self._gamepad
     
     @property
     def red_led(self):
@@ -124,7 +140,7 @@ class Badge:
             import adafruit_il0373
             displayio.release_displays()
             self._display = adafruit_il0373.IL0373(self.display_bus, width=296, height=128, rotation=270,
-                                                   seconds_per_frame=5, busy_pin=board.DISP_BUSY, black_bits_inverted=True)
+                                                   seconds_per_frame=5, busy_pin=board.DISP_BUSY)
         return self._display
 
     @property
@@ -132,7 +148,7 @@ class Badge:
         """Obtain acceleration as a tuple with 3 elements: (x, y, z)"""
         if not self._lis3dh:
             import adafruit_lis3dh
-            self._lis3dh = adafruit_lis3dh.LIS3DH_I2C(self._i2c, address=0x18)
+            self._lis3dh = adafruit_lis3dh.LIS3DH_I2C(self.i2c, address=0x18)
         return self._lis3dh.acceleration
 
     @property
