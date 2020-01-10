@@ -50,7 +50,7 @@ def run():
         else:
             if btns == 0x1f:
                 # Success : all buttons were pressed
-                badge.pixels.fill((0, 0xff, 0))
+                badge.pixels.fill((0, 0x10, 0))
                 buttons_ok_label.color = 0x0
             elif int(time.monotonic() * 2) % 2:
                 badge.pixels.fill((0, 0, 0x10))
