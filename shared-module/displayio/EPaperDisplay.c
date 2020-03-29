@@ -197,6 +197,23 @@ mp_obj_t common_hal_displayio_epaperdisplay_get_bus(displayio_epaperdisplay_obj_
     return self->core.bus;
 }
 
+void displayio_epaperdisplay_partial(displayio_epaperdisplay_obj_t* self)
+{
+    uint8_t partial_seq[] = {
+        0x91, 0x00, // PTIN
+        0x90, 0x07, // PARTIAL_WINDOW
+            0x00, // HRST - horizontal start
+            0x7f, // HRED - horizontial end (width - 1)
+            0, // VRST - vertical start
+            0, // VRST - vertical start
+            1, // VRED - vertical end (height / 256)
+            0x27, // VRED - vertical end ((height % 256) - 1)
+            0x28 // copied from waveshare
+            };
+
+    send_command_sequence(self, false, partial_seq, sizeof(partial_seq));
+}
+
 bool displayio_epaperdisplay_refresh_area(displayio_epaperdisplay_obj_t* self, const displayio_area_t* area) {
     uint16_t buffer_size = 128; // In uint32_ts
 
@@ -232,7 +249,7 @@ bool displayio_epaperdisplay_refresh_area(displayio_epaperdisplay_obj_t* self, c
     uint32_t mask[mask_length];
 
     uint8_t passes = 1;
-    if (self->core.colorspace.tricolor) {
+    if (self->core.colorspace.tricolor || true) { // self->partial
         passes = 2;
     }
     for (uint8_t pass = 0; pass < passes; pass++) {
@@ -244,6 +261,8 @@ bool displayio_epaperdisplay_refresh_area(displayio_epaperdisplay_obj_t* self, c
             self->set_row_window_command, self->set_current_column_command, self->set_current_row_command,
             false, self->chip_select, &clipped, false);
         }
+
+        displayio_epaperdisplay_partial(self);
 
         uint8_t write_command = self->write_black_ram_command;
         if (pass == 1) {
@@ -272,9 +291,9 @@ bool displayio_epaperdisplay_refresh_area(displayio_epaperdisplay_obj_t* self, c
             memset(buffer, 0, buffer_size * sizeof(buffer[0]));
 
             self->core.colorspace.grayscale = true;
-            if (pass == 1) {
-                self->core.colorspace.grayscale = false;
-            }
+            // if (pass == 1) {
+            //     self->core.colorspace.grayscale = false;
+            // }
             displayio_display_core_fill_area(&self->core, &subrectangle, mask, buffer);
 
             // Invert it all.
