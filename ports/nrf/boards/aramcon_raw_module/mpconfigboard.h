@@ -33,24 +33,8 @@
 
 #define CIRCUITPY_AUTORELOAD_DELAY_MS 500
 
-#ifdef QSPI_FLASH_FILESYSTEM
-#define MICROPY_QSPI_DATA0                NRF_GPIO_PIN_MAP(0, 22)
-#define MICROPY_QSPI_DATA1                NRF_GPIO_PIN_MAP(0, 20)
-#define MICROPY_QSPI_DATA2                NRF_GPIO_PIN_MAP(1, 4)
-#define MICROPY_QSPI_DATA3                NRF_GPIO_PIN_MAP(1, 6)
-#define MICROPY_QSPI_SCK                  NRF_GPIO_PIN_MAP(1, 0)
-#define MICROPY_QSPI_CS                   NRF_GPIO_PIN_MAP(1, 2)
-#endif
-
-#ifdef SPI_FLASH_FILESYSTEM
-#define SPI_FLASH_MOSI_PIN &pin_P0_20
-#define SPI_FLASH_MISO_PIN &pin_P0_22
-#define SPI_FLASH_SCK_PIN &pin_P1_00
-#define SPI_FLASH_CS_PIN &pin_P1_02
-#endif
-
 // Explanation of how a user got into safe mode.
-#define BOARD_USER_SAFE_MODE_ACTION "pressing the left button at start up"
+#define BOARD_USER_SAFE_MODE_ACTION translate("pressing the left button at start up.\n")
 
 // If you change this, then make sure to update the linker scripts as well to
 // make sure you don't overwrite code
