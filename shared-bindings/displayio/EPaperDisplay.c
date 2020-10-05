@@ -88,11 +88,12 @@
 //|         ...
 //|
 STATIC mp_obj_t displayio_epaperdisplay_make_new(const mp_obj_type_t *type, size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
-    enum { ARG_display_bus, ARG_start_sequence, ARG_stop_sequence, ARG_width, ARG_height, ARG_ram_width, ARG_ram_height, ARG_colstart, ARG_rowstart, ARG_rotation, ARG_set_column_window_command, ARG_set_row_window_command, ARG_set_current_column_command, ARG_set_current_row_command, ARG_write_black_ram_command, ARG_black_bits_inverted, ARG_write_color_ram_command, ARG_color_bits_inverted, ARG_highlight_color, ARG_refresh_display_command,  ARG_refresh_time, ARG_busy_pin, ARG_busy_state, ARG_seconds_per_frame, ARG_always_toggle_chip_select };
+    enum { ARG_display_bus, ARG_start_sequence, ARG_stop_sequence, ARG_partial_refresh_sequence, ARG_width, ARG_height, ARG_ram_width, ARG_ram_height, ARG_colstart, ARG_rowstart, ARG_rotation, ARG_set_column_window_command, ARG_set_row_window_command, ARG_set_current_column_command, ARG_set_current_row_command, ARG_write_black_ram_command, ARG_black_bits_inverted, ARG_write_color_ram_command, ARG_color_bits_inverted, ARG_highlight_color, ARG_refresh_display_command,  ARG_refresh_time, ARG_busy_pin, ARG_busy_state, ARG_seconds_per_frame, ARG_always_toggle_chip_select };
     static const mp_arg_t allowed_args[] = {
         { MP_QSTR_display_bus, MP_ARG_REQUIRED | MP_ARG_OBJ },
         { MP_QSTR_start_sequence, MP_ARG_REQUIRED | MP_ARG_OBJ },
         { MP_QSTR_stop_sequence, MP_ARG_REQUIRED | MP_ARG_OBJ },
+        { MP_QSTR_partial_refresh_sequence, MP_ARG_REQUIRED | MP_ARG_OBJ },
         { MP_QSTR_width, MP_ARG_INT | MP_ARG_KW_ONLY | MP_ARG_REQUIRED, },
         { MP_QSTR_height, MP_ARG_INT | MP_ARG_KW_ONLY | MP_ARG_REQUIRED, },
         { MP_QSTR_ram_width, MP_ARG_INT | MP_ARG_KW_ONLY | MP_ARG_REQUIRED, },
@@ -125,7 +126,8 @@ STATIC mp_obj_t displayio_epaperdisplay_make_new(const mp_obj_type_t *type, size
     mp_get_buffer_raise(args[ARG_start_sequence].u_obj, &start_bufinfo, MP_BUFFER_READ);
     mp_buffer_info_t stop_bufinfo;
     mp_get_buffer_raise(args[ARG_stop_sequence].u_obj, &stop_bufinfo, MP_BUFFER_READ);
-
+    mp_buffer_info_t partial_refresh_bufinfo;
+    mp_get_buffer_raise(args[ARG_partial_refresh_sequence].u_obj, &partial_refresh_bufinfo, MP_BUFFER_READ);
 
     const mcu_pin_obj_t* busy_pin = validate_obj_is_free_pin_or_none(args[ARG_busy_pin].u_obj);
 
@@ -150,7 +152,7 @@ STATIC mp_obj_t displayio_epaperdisplay_make_new(const mp_obj_type_t *type, size
     common_hal_displayio_epaperdisplay_construct(
         self,
         display_bus,
-        start_bufinfo.buf, start_bufinfo.len, stop_bufinfo.buf, stop_bufinfo.len,
+        start_bufinfo.buf, start_bufinfo.len, stop_bufinfo.buf, stop_bufinfo.len, partial_refresh_bufinfo.buf, partial_refresh_bufinfo.len,
         args[ARG_width].u_int, args[ARG_height].u_int, args[ARG_ram_width].u_int, args[ARG_ram_height].u_int, args[ARG_colstart].u_int, args[ARG_rowstart].u_int, rotation,
         args[ARG_set_column_window_command].u_int, args[ARG_set_row_window_command].u_int,
         args[ARG_set_current_column_command].u_int, args[ARG_set_current_row_command].u_int,
