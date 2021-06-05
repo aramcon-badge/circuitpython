@@ -23,6 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#include <string.h>
 
 #include "shared-bindings/displayio/EPaperDisplay.h"
 
@@ -33,6 +34,8 @@
 #include "py/objproperty.h"
 #include "py/objtype.h"
 #include "py/runtime.h"
+#include "py/objstr.h"
+#include "py/mpprint.h"
 #include "shared-bindings/displayio/Group.h"
 #include "shared-bindings/microcontroller/Pin.h"
 #include "shared-bindings/util.h"
@@ -214,6 +217,41 @@ STATIC mp_obj_t displayio_epaperdisplay_obj_show(mp_obj_t self_in, mp_obj_t grou
     return mp_const_none;
 }
 MP_DEFINE_CONST_FUN_OBJ_2(displayio_epaperdisplay_show_obj, displayio_epaperdisplay_obj_show);
+
+STATIC mp_obj_t update_refresh_mode(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args)
+{
+    enum { ARG_start_sequence, ARG_seconds_per_frame };
+    static const mp_arg_t allowed_args[] = {
+        { MP_QSTR_start_sequence, MP_ARG_REQUIRED | MP_ARG_OBJ },
+        { MP_QSTR_seconds_per_frame, MP_ARG_OBJ, {.u_obj = MP_OBJ_NEW_SMALL_INT(180)} },
+    };
+    displayio_epaperdisplay_obj_t *self = native_display(pos_args[0]);
+    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+    mp_arg_parse_all(n_args - 1, pos_args + 1, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+
+    // Get parameters
+    mp_buffer_info_t start_sequence;
+    mp_get_buffer_raise(args[ARG_start_sequence].u_obj, &start_sequence, MP_BUFFER_READ);
+    float seconds_per_frame = mp_obj_get_float(args[ARG_seconds_per_frame].u_obj);
+
+    /*
+    mp_printf(&mp_plat_print, "=========================================================\nNEW MODE\n");
+    mp_printf(&mp_plat_print, "Sequence Length: %d\n", start_sequence.len);
+    for(size_t i=0; i<start_sequence.len; i++)
+    {
+        mp_printf(&mp_plat_print, "%02x", ((uint8_t *)start_sequence.buf)[i]);
+    }
+    mp_printf(&mp_plat_print, "\nseconds_per_frame: %f\n", (double)seconds_per_frame);
+    mp_printf(&mp_plat_print, "=========================================================\n");
+    */
+
+    // Update parameters
+    self->start_sequence = (uint8_t *)start_sequence.buf;
+    self->start_sequence_len = start_sequence.len;
+    self->milliseconds_per_frame = seconds_per_frame * 1000;
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_KW(update_refresh_mode_obj, 3, update_refresh_mode);
 
 //|     def refresh(self) -> None:
 //|         """Refreshes the display immediately or raises an exception if too soon. Use

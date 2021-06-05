@@ -43,7 +43,7 @@
 #include <string.h>
 
 void common_hal_displayio_epaperdisplay_construct(displayio_epaperdisplay_obj_t *self,
-    mp_obj_t bus, const uint8_t *start_sequence, uint16_t start_sequence_len,
+    mp_obj_t bus, uint8_t *start_sequence, uint16_t start_sequence_len,
     const uint8_t *stop_sequence, uint16_t stop_sequence_len,
     uint16_t width, uint16_t height, uint16_t ram_width, uint16_t ram_height,
     int16_t colstart, int16_t rowstart, uint16_t rotation,
@@ -136,6 +136,18 @@ STATIC void wait_for_busy(displayio_epaperdisplay_obj_t *self) {
 
 STATIC void send_command_sequence(displayio_epaperdisplay_obj_t *self,
     bool should_wait_for_busy, const uint8_t *sequence, uint32_t sequence_len) {
+
+    /*
+    mp_printf(&mp_plat_print, "=========================================================\nREFRESH\n");
+    mp_printf(&mp_plat_print, "Refresh length: %d\n", sequence_len);
+    for(size_t i=0; i<sequence_len; i++)
+    {
+        mp_printf(&mp_plat_print, "%02x", sequence[i]);
+    }
+    mp_printf(&mp_plat_print, "current seconds_per_frame: %f\n", (double)((float)self->milliseconds_per_frame / 1000.0f));
+    mp_printf(&mp_plat_print, "\n=========================================================\n");
+    */
+
     uint32_t i = 0;
     while (i < sequence_len) {
         const uint8_t *cmd = sequence + i;
